@@ -1,23 +1,15 @@
 require('dotenv').config()
-const { PORT = 3001, DATABASE_URL } = process.env
+const { PORT = 3001 } = process.env
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 const mongoose = require('mongoose')
 
-
 // create app
 const app = express()
 
-// mongoose 
-mongoose.connect(DATABASE_URL,{
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}, ()=>{});
-mongoose.connection
-.on("error", err => console.log(`error\n${err.message}`))
-.on("connected", ()=> console.log("Mongo DB Connected"))
-.on("disconnected", ()=> console.log("Mongo DB Disconnected"))
+// mongoose connection 
+require('./config/database')
 
 const PeopleSchema = new mongoose.Schema({
     name: String,
@@ -45,7 +37,7 @@ app.get('/', (req,res)=>{
 app.get('/people', async (req,res)=>{
     try{
         // decalre as a variable so this way you are able to manipulate the data
-        res.json(await People.find({}))
+        res.json(await (await People.find({})).reverse())
     }catch(err){
         res.status(400).json(err)
     }
